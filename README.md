@@ -6,7 +6,7 @@
 
 ## 📌 Executive Summary
 
-Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why revenue grew 10x YoY while profitability leaked through returns and geographic concentration. Using RFM (Recency, Frequency, Monetary) segmentation and cohort analysis, I discovered that 12% of customers drive 78% of revenue while a 16.5% return rate costs the business $611K annually. Strategic recommendations across return reduction, mid-tier customer upselling, geographic diversification, and whale retention could unlock **$2.1M incremental revenue** and **$152K annual savings**—a combined **$2.25M business impact**.
+Analyzed 22,000+ transactions from 4,372 customers across 3 years to uncover why revenue grew 10x YoY while profitability leaked through returns and geographic concentration. Using Power Query data transformation and RFM (Recency, Frequency, Monetary) segmentation analysis, I discovered that 12% of customers drive 78% of revenue while a 16.5% return rate costs the business $611K annually. Strategic recommendations across return reduction, mid-tier customer upselling, geographic diversification, and whale retention could unlock **$2.1M incremental revenue** and **$152K annual savings**—a combined **$2.25M business impact**.
 
 ---
 
@@ -32,65 +32,78 @@ Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why r
 
 ## 🔧 Methodology
 
-### 1️⃣ **Data Preparation & ETL** [SQL + Python]
-   - Consolidated 22,000 transactions across 3 years; standardized customer IDs across regions (regex matching for inconsistencies)
-   - Cleaned data: Handled 0-value transactions, missing product categories, date anomalies
-   - Created dimensional tables: Customers, Orders, Products, Returns, Geography
-   - **Challenge Solved:** Transactions from same customer had different ID formats (REG-001 vs. REG001) → unified via pattern matching
+### 1️⃣ **Data Extraction & Preparation** [Kaggle + Power Query]
+   - Downloaded 22,000+ transaction records from Kaggle e-commerce dataset
+   - Imported raw data into Power BI (CSV format)
+   - Used Power Query to clean and standardize data:
+     - Removed duplicates and null values
+     - Standardized date formats across all records
+     - Unified inconsistent customer ID formats and region names
+     - Calculated derived fields: Order date, Return flag, Customer tenure
+   - **Challenge Solved:** Raw data had inconsistent formatting (customer IDs in different formats, region names spelled differently) → standardized via Power Query find & replace and transformations
 
-### 2️⃣ **RFM Segmentation & Customer Classification** [Python - Pandas/NumPy]
-   - **Recency:** Days since last purchase (0-1095 days, 40.2 days median)
-   - **Frequency:** Number of orders per customer (1-127 orders, 5.03 median)
-   - **Monetary:** Lifetime customer value ($10-$127K, $1,897 median)
+### 2️⃣ **RFM Segmentation & Customer Classification** [Power Query + DAX]
+   - **Recency:** Calculated days since last purchase for each customer (0-1095 days, 40.2 days median)
+   - **Frequency:** Counted number of orders per customer (1-127 orders, 5.03 median)
+   - **Monetary:** Summed total lifetime customer value ($10-$127K, $1,897 median)
+   - Created custom RFM score columns using DAX formulas
    - Bucketed customers into 9 RFM segments: Champions, Loyal Customers, Potential Loyalists, At-Risk, Can't Lose, Lost, New, Promising, and Need Attention
    - **Key Finding:** Champions = 523 customers (12%) driving $6.5M (78% of revenue); Lost = 402 customers (9%) previously high-value now dormant
 
-### 3️⃣ **Behavioral Cohort Analysis** [SQL]
-   - Tracked repeat purchase rate, return rate, AOV by acquisition month (36 cohorts)
-   - Discovered cohort decay: Early cohorts = 98.8% repeat rate vs. recent cohorts = 91.2% repeat rate
-   - Identified declining AOV trend: Early cohorts $425/customer vs. recent cohorts $298/customer
+### 3️⃣ **Behavioral Cohort Analysis** [Power Query + DAX]
+   - Grouped transactions by customer acquisition month to create 36 monthly cohorts
+   - Calculated repeat purchase rate, return rate, and AOV for each cohort
+   - Built trend analysis: Identified declining repeat rate in newer cohorts (Jan 2022 = 98.8% vs. Dec 2024 = 91.2%)
+   - Tracked AOV decline: Early cohorts $425/customer vs. recent cohorts $298/customer
    - **Pattern:** Newer customers have lower order frequency + higher return likelihood
 
-### 4️⃣ **Return Root Cause Analysis** [Python + SQL]
-   - Segmented returns by product category, delivery partner, customer tier, geography
-   - **By Category:** Category X = 22% return rate (vs. 8% avg), Category Y = 6% (best), Category Z = 14%
-   - **By Geography:** UK = 18%, Germany = 14%, France = 10%, Spain = 8%
-   - **By Delivery Partner:** Partner A = 12% return rate, Partner B = 19% return rate → performance gap
-   - **By Customer Tier:** Whale customers = 8% return rate, Mid-tier = 16%, Low-tier = 19%
-   - **Hypothesis:** Lower-value customers may be quality-price sensitive; higher returns on budget-tier products
+### 4️⃣ **Return Root Cause Analysis** [Power Query Grouping & DAX]
+   - Segmented returns by multiple dimensions:
+     - **By Category:** Category X = 22% return rate (vs. 8% avg), Category Y = 6%, Category Z = 14%
+     - **By Geography:** UK = 18%, Germany = 14%, France = 10%, Spain = 8%
+     - **By Delivery Partner:** Partner A = 12% return rate, Partner B = 19% return rate
+     - **By Customer Tier:** Whale customers = 8%, Mid-tier = 16%, Low-tier = 19%
+   - Used Power Query to cross-tabulate return rates across dimensions
+   - **Hypothesis:** Lower-value customers are quality-price sensitive; higher returns on budget-tier products
 
-### 5️⃣ **Interactive Dashboard & Strategic Narrative** [Power BI]
-   - Built 4-page interactive dashboard with RFM analysis, cohort retention tracking, return rate analysis, and geographic breakdown
-   - Dashboard enables drill-down by segment, time period, geography, product category
-   - Translated technical insights into 4 strategic recommendations tied to business impact
+### 5️⃣ **Interactive Dashboard & Strategic Narrative** [Power BI Desktop]
+   - Built 4-page interactive Power BI dashboard:
+     - **Page 1:** Sales Trend Analysis (revenue & orders over time, monthly/yearly breakdown)
+     - **Page 2:** Customer Insights (RFM segmentation, retention trends, repeat purchase rate)
+     - **Page 3:** Return Analysis (return rate heatmap by category/geography, financial impact)
+     - **Page 4:** Geographic Performance (revenue by region, sales location map)
+   - Implemented interactive features:
+     - Slicers for date range, segment, category, geography
+     - Drill-down functionality by month/quarter/year
+     - KPI cards for revenue, customers, return rate, repeat rate
+   - Translated technical findings into 4 strategic recommendations tied to business impact
 
 ---
 
 ## 🛠️ Skills Demonstrated
 
-### 📊 **Data Analytics & SQL**
-- **Complex SQL Joins & Window Functions:** Multi-table transaction analysis (Orders JOIN Customers JOIN Returns JOIN Products) with window functions for cohort retention calculations
-- **Cohort Analysis:** Tracked repeat purchase rates across multiple cohorts; identified acquisition month correlation with AOV decline
-- **RFM Ranking:** Partitioned data by customer segments using SQL RANK(), DENSE_RANK() for performance benchmarking
-- **Geographic & Categorical Segmentation:** Region-wise, category-wise, partner-wise performance analysis with aggregation at multiple levels
+### 📊 **Data Analytics & ETL**
+- **Power Query Data Transformation:** Cleaned 22,000+ records; standardized formats; removed duplicates and null values
+- **Cohort Analysis:** Grouped transactions by acquisition month; tracked 36 cohorts over time; identified acquisition month correlation with AOV decline
+- **Multi-Dimensional Segmentation:** Analyzed return rates across category × geography × partner × customer tier dimensions
+- **Geographic & Categorical Aggregation:** Region-wise, category-wise, partner-wise performance analysis with Power Query grouping
 
-### 🐍 **Python & Data Science**
-- **RFM Segmentation:** Built 9-tier customer classification using Pandas (calculated R/F/M scores), NumPy (percentile binning), and custom segmentation logic
-- **Exploratory Data Analysis:** Identified outliers (whale customers), seasonality patterns, concentration risks
-- **Cohort Decay Analysis:** Computed retention curves, churn rates, and trend analysis to forecast future cohort performance
-- **Root Cause Isolation:** Statistical comparison of return rates across dimensions
-
-### 📈 **Business Intelligence & Visualization**
-- **Power BI Dashboard Design:** 4-page interactive dashboard with slicers, conditional formatting, drill-through functionality
-- **Data Storytelling:** Translated RFM segments into business narratives
-- **KPI Design & Metrics:** Designed composite metrics (AOV by segment, return rate by category, repeat purchase rate) that drive decision-making
-- **Visualization Best Practices:** Scatter plots (RFM), line charts (cohort trends), heatmaps (return analysis), bar charts
+### 📈 **Business Intelligence & DAX**
+- **Power BI Dashboard Design:** 4-page interactive dashboard with slicers, drill-down, conditional formatting, KPI cards
+- **DAX Calculations:** Created RFM scores, return rate %, repeat purchase rate %, AOV calculations using DAX formulas
+- **Data Visualization Best Practices:** Scatter plots (RFM), line charts (cohort trends), heatmaps (return analysis), bar charts (revenue by segment), pie charts (geographic distribution)
+- **Interactive Storytelling:** Enabled users to drill into data by segment, time period, geography, product category
 
 ### 💼 **Business Acumen & Strategic Thinking**
-- **Revenue Leakage Identification:** Quantified $611K loss to returns + identified geographic concentration risk
-- **Customer Lifetime Value Analysis:** Identified that whales contribute 78% of revenue despite being 12% of customer base
-- **Upsell Opportunity Modeling:** Estimated mid-tier customer segment could generate $1.8M-$2.1M incremental revenue
-- **Risk Assessment & Mitigation:** Flagged geographic concentration, cohort decay, and whale dependency risks
+- **Revenue Leakage Identification:** Quantified $611K loss to returns; identified geographic concentration risk (98% Europe)
+- **Customer Lifetime Value Analysis:** Segmented customers by profit potential; identified that 12% (Champions) drive 78% of revenue
+- **Upsell Opportunity Modeling:** Estimated mid-tier customer segment could generate $1.8M-$2.1M incremental revenue if AOV lifted 30-40%
+- **Risk Assessment & Mitigation:** Flagged geographic concentration (98% Europe), cohort decay (newer cohorts perform worse), and whale customer dependency risks
+
+### 🎯 **Communication & Insights Translation**
+- **Translated Data into Action:** Moved beyond "here's the data" to "here's what we should do about it"
+- **Executive-Ready Insights:** Packaged technical analysis into 4 strategic recommendations with quantified business impact
+- **Actionable Next Steps:** Defined 90-day roadmap with specific owners, deadlines, and success metrics
 
 ---
 
@@ -162,10 +175,10 @@ Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why r
   - Combined with low-tier upsell: Could reach $2.1M total uplift
 
 - **Recommended Actions:**
-  - Segment mid-tier by product affinity using purchase history
+  - Segment mid-tier by product affinity using purchase history analysis
   - Launch personalized email campaigns: "Customers like you also loved these items" + 10% loyalty discount
   - Implement loyalty rewards: 5% discount on repeat orders for mid-tier segment
-  - Add product recommendations on website (collaborative filtering)
+  - Add product recommendations on website (collaborative filtering or simple category recommendations)
 
 - **Expected Impact:** Lift mid-tier AOV by 30-40% = $1.8M-$2.1M incremental annual revenue (170-240% ROI on campaign)
   
@@ -316,9 +329,9 @@ Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why r
 - **Power BI Dashboard:** `E-commerce Trend Analysis.pbix` (4-page interactive dashboard)
 - **Executive Report:** `E-commerce Customer Segmentation & Analysis.pdf` (8-page document)
 - **Presentation Deck:** `E-commerce Customer Segmentation & Analysis.pptx` (12 slides)
-- **Raw Data:** `data.csv` (22,000+ transaction records)
+- **Raw Data:** `data.csv` (22,000+ transaction records from Kaggle)
 - **Dashboard Screenshots:** `/assets/` folder (visual proof)
-- **GitHub Repo:** Complete analysis + code + documentation
+- **GitHub Repo:** Complete analysis + documentation
 
 ---
 
@@ -328,7 +341,7 @@ Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why r
 2. **For Marketing Teams:** Focus on Recommendation #2 (Upsell Campaign)
 3. **For Supply Chain:** Focus on Recommendation #1 (Return Reduction)
 4. **For Product Teams:** Focus on Recommendation #3 (Geo Expansion) + #4 (Whale Retention)
-5. **For Analytics Teams:** Review full Methodology + Dashboard
+5. **For Analytics Teams:** Review full Methodology + Dashboard design
 
 ---
 
@@ -337,8 +350,8 @@ Analyzed 22,000+ transactions from 4,372 customers over 3 years to uncover why r
 This analysis is the foundation for action. Available for:
 - Deeper segment-level analysis
 - Custom cohort studies
-- Statistical validation
-- Financial modeling for expansion
+- Dashboard drill-down exploration
+- Strategic implementation support
 
 ---
 
